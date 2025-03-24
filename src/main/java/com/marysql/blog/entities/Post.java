@@ -20,7 +20,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "autor_id", nullable = false)
-    private Usuario autor;
+    private BlogUser autor;
 
     @Column(nullable = false, updatable = false)
     private Instant dataPublicacao;
@@ -55,11 +55,11 @@ public class Post {
         this.conteudo = conteudo;
     }
 
-    public Usuario getAutor() {
+    public BlogUser getAutor() {
         return autor;
     }
 
-    public void setAutor(Usuario autor) {
+    public void setAutor(BlogUser autor) {
         this.autor = autor;
     }
 

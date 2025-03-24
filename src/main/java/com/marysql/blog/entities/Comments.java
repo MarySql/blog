@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
-public class Comentarios {
+public class Comments {
 
     @Id
     @GeneratedValue
@@ -16,7 +16,7 @@ public class Comentarios {
 
     @ManyToOne
     @JoinColumn(name = "autor_id", nullable = false)
-    private Usuario autor;
+    private BlogUser autor;
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
@@ -41,11 +41,11 @@ public class Comentarios {
         this.conteudo = conteudo;
     }
 
-    public Usuario getAutor() {
+    public BlogUser getAutor() {
         return autor;
     }
 
-    public void setAutor(Usuario autor) {
+    public void setAutor(BlogUser autor) {
         this.autor = autor;
     }
 

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class Usuario {
+public class BlogUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -31,7 +31,7 @@ public class Usuario {
     private Instant createdAt;
 
     // Construtor
-    public Usuario() {
+    public BlogUser() {
         this.createdAt = Instant.now();
     }
 
