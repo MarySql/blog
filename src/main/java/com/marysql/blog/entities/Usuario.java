@@ -1,17 +1,16 @@
 package com.marysql.blog.entities;
 
 import jakarta.persistence.*;
-
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) // ou GenerationType.UUID, dependendo da versão do JPA
-    private UUID id; // UUID como chave primária
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     @Column(nullable = false)
     private String nome;
@@ -22,22 +21,21 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(columnDefinition = "TEXT") // Tipo texto para bio
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
     @Column(nullable = false, updatable = false)
-    private Timestamp createdAt; // Data de criação
+    private Instant createdAt;
 
-    // Contrutorzinho
-    public User() {
-        this.createdAt = new Timestamp(System.currentTimeMillis());
+    // Construtor
+    public Usuario() {
+        this.createdAt = Instant.now();
     }
 
     // Getters e Setters
-
     public UUID getId() {
         return id;
     }
@@ -86,8 +84,7 @@ public class User {
         this.profilePictureUrl = profilePictureUrl;
     }
 
-    public Timestamp getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
-
 }
