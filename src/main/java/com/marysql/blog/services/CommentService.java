@@ -1,9 +1,8 @@
 package com.marysql.blog.services;
 
 import com.marysql.blog.entities.BlogUser;
-import com.marysql.blog.entities.Comments;
+import com.marysql.blog.entities.Comment;
 import com.marysql.blog.entities.Post;
-import com.marysql.blog.entities.BlogUser;
 import com.marysql.blog.repositories.CommentRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,23 +18,23 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public List<Comments> listarTodos() {
+    public List<Comment> listarTodos() {
         return commentRepository.findAll();
     }
 
-    public Optional<Comments> buscarPorId(UUID id) {
+    public Optional<Comment> buscarPorId(UUID id) {
         return commentRepository.findById(id);
     }
 
-    public List<Comments> buscarPorPost(Post post) {
+    public List<Comment> buscarPorPost(Post post) {
         return commentRepository.findByPost(post);
     }
 
-    public List<Comments> buscarPorAutor(BlogUser autor) {
+    public List<Comment> buscarPorAutor(BlogUser autor) {
         return commentRepository.findByAutor(autor);
     }
 
-    public Comments salvar(Comments comentario) {
+    public Comment salvar(Comment comentario) {
         return commentRepository.save(comentario);
     }
 

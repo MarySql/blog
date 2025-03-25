@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
-public class Comments {
+public class Comment {
 
     @Id
     @GeneratedValue
