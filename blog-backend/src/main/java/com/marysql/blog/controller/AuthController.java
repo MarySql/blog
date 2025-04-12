@@ -20,4 +20,11 @@ public class AuthController {
     private ResponseEntity<String> rigister(@RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(authService.register(userDTO));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(authService.login(userDTO));
+    }
 }
+
+
