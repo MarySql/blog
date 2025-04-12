@@ -1,3 +1,4 @@
+// Como a autenticação é stateless (JWT), o logout é gerenciado no frontend, invalidando o token ex: removendo do localStorage
 package com.marysql.blog.controller;
 
 import com.marysql.blog.model.dto.UserDTO;
@@ -26,5 +27,4 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(userDTO));
     }
 }
-
 
