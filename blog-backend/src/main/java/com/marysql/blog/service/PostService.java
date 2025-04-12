@@ -39,6 +39,19 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public PostDTO updatePost(String id, PostDTO postDTO, String authorId) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        if (!post.getAuthorId().equals(authorId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        post.setTitle(postDTO.getTitle());
+        post.setContent(postDTO.getContent());
+        post.setUpdatedAt(LocalDateTime.now());
+        post = postRepository.save(post);
+        return mapToDTO(post);
+    }
+
     public void deletePost(String id, String authorId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
