@@ -5,6 +5,8 @@ import com.marysql.blog.model.entity.User;
 import com.marysql.blog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +42,9 @@ public class AuthService {
         return "Usuário registrado com sucesso!"
     }
 
-
+    public String login(UserDTO userDTO) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword()));
+        return jwtUtil.generateToken(authentication.getName());
+    }
 }
