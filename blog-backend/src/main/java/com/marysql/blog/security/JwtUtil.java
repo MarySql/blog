@@ -19,4 +19,8 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.ES512, secret)
                 .compact();
     }
+
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+    }
 }
