@@ -1,8 +1,9 @@
-package com.marysql.blog.security;
+package com.marysql.blog.service;
 
 import com.marysql.blog.model.dto.UserDTO;
 import com.marysql.blog.model.entity.User;
 import com.marysql.blog.repository.UserRepository;
+import com.marysql.blog.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +20,7 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    Autowired
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -39,7 +40,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userRepository.save(user);
 
-        return "Usuário registrado com sucesso!"
+        return "Usuário registrado com sucesso!";
     }
 
     public String login(UserDTO userDTO) {
