@@ -63,10 +63,13 @@ public class PostService {
 
     private PostDTO mapToDTO(Post post) {
         PostDTO postDTO = new PostDTO();
+        postDTO.setId(post.getId());
         postDTO.setTitle(post.getTitle());
         postDTO.setContent(post.getContent());
+        postDTO.setAuthorId(post.getAuthorId());
         postDTO.setCreatedAt(post.getCreatedAt());
         postDTO.setUpdatedAt(post.getUpdatedAt());
         return postDTO;
     }
+
 }

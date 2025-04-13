@@ -4,16 +4,22 @@ import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { postService } from "@/services/postService";
 import { Post } from "@/types/post";
-import ReactMarkdown from "react-markdown";
+import dynamic from "next/dynamic";
 
-interface PostDetailsPageProps {
+const MarkdownEditor = dynamic(
+  () => import("@/components/MarkdownEditor"),
+  { ssr: false }
+);
+
+interface EditPostPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function PostDetailsPage({ params }: PostDetailsPageProps) {
+export default function EditPostPage({ params }: EditPostPageProps) {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const { id } = use(params);
 
@@ -38,16 +44,21 @@ export default function PostDetailsPage({ params }: PostDetailsPageProps) {
     fetchPost();
   }, [id, router]);
 
-  const handleDelete = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!post) return;
-    
-    if (window.confirm("Tem certeza que deseja excluir este post?")) {
-      try {
-        await postService.deletePost(id, post.authorId);
-        router.push("/posts");
-      } catch (err) {
-        setError("Erro ao excluir post");
-      }
+
+    setSaving(true);
+    try {
+      await postService.updatePost(id, {
+        title: post.title,
+        content: post.content
+      });
+      router.push(`/posts/${id}`);
+    } catch (err) {
+      setError("Erro ao atualizar post");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -105,52 +116,50 @@ export default function PostDetailsPage({ params }: PostDetailsPageProps) {
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="p-6">
-            <div className="flex justify-between items-start mb-6">
-              <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
-              <div className="flex space-x-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-6">Editar Post</h1>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                  Título
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={post.title}
+                  onChange={(e) => setPost({ ...post, title: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+                  Conteúdo
+                </label>
+                <div className="mt-1">
+                  <MarkdownEditor
+                    value={post.content}
+                    onChange={(content) => setPost({ ...post, content })}
+                    className="min-h-[300px]"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-4">
                 <button
-                  onClick={() => router.push(`/posts/${id}/edit`)}
-                  className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                  type="button"
+                  onClick={() => router.push(`/posts/${id}`)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
-                  Editar
+                  Cancelar
                 </button>
                 <button
-                  onClick={handleDelete}
-                  className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
                 >
-                  Excluir
+                  {saving ? "Salvando..." : "Salvar"}
                 </button>
               </div>
-            </div>
-            <div className="prose max-w-none">
-              <ReactMarkdown>{post.content}</ReactMarkdown>
-            </div>
-            <div className="mt-6 text-sm text-gray-500">
-              <p>Autor: {post.authorId}</p>
-              <p>Data: {new Date(post.createdAt).toLocaleDateString()}</p>
-            </div>
-            <div className="mt-8">
-              <button
-                onClick={() => router.push("/posts")}
-                className="flex items-center text-blue-500 hover:text-blue-600"
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                Voltar para posts
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>

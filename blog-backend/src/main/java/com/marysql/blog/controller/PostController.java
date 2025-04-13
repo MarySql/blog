@@ -46,7 +46,9 @@ public class PostController {
     }
 
     private String getUserIdFromAuthentication(Authentication authentication) {
-        // Implementar lógica para obter o ID do usuário autenticado
-        return "user-id-placeholder"; // Substituir com lógica real
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Usuário não autenticado");
+        }
+        return authentication.getName(); // Retorna o username do usuário autenticado
     }
 }

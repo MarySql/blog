@@ -7,9 +7,12 @@ import java.util.List;
 
 @Data
 public class PostDTO {
+    private String id;
     private String title;
     private String content;
+    private String authorId;
+    private String authorUsername;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CommentDTO> comments;
 }
+

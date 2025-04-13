@@ -2,92 +2,69 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
+import { postService } from "@/services/postService";
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: () => Promise<void>;
+  isAuthenticated: boolean;
+  user: string | null;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    checkAuth();
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+      setUser(localStorage.getItem("username"));
+    }
   }, []);
 
-  const checkAuth = async () => {
+  const login = async (username: string, password: string) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("http://localhost:8080/api/auth/me", {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        localStorage.removeItem("token");
-      }
-    } catch (error) {
-      console.error("Erro ao verificar autenticação:", error);
-      localStorage.removeItem("token");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token não encontrado");
-      }
-
-      const response = await fetch("http://localhost:8080/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
-        throw new Error("Falha ao autenticar");
+        if (response.status === 401) {
+          throw new Error("Credenciais inválidas");
+        }
+        throw new Error("Erro ao fazer login");
       }
 
-      const userData = await response.json();
-      setUser(userData);
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("username", username);
+      setIsAuthenticated(true);
+      setUser(username);
+      router.push("/posts");
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
+      console.error("Login error:", error);
       throw error;
     }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    setIsAuthenticated(false);
     setUser(null);
-    router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -96,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
