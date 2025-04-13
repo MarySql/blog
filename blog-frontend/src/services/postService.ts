@@ -1,47 +1,63 @@
 import { Post } from "@/types/post";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+const API_URL = "http://localhost:8080/api";
+
+interface CreatePostData {
+  title: string;
+  content: string;
+  authorId: string;
+}
 
 export const postService = {
   async getAllPosts(): Promise<Post[]> {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Usuário não autenticado");
+    }
+
     const response = await fetch(`${API_URL}/posts`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
     });
-
     if (!response.ok) {
       throw new Error("Erro ao carregar posts");
     }
-
     return response.json();
   },
 
   async getPostById(id: string): Promise<Post> {
-    const response = await fetch(`${API_URL}/posts/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        Accept: "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Erro ao carregar post");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Usuário não autenticado");
     }
 
+    const response = await fetch(`${API_URL}/posts/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Post não encontrado");
+    }
     return response.json();
   },
 
-  async createPost(post: Omit<Post, "id" | "authorId" | "createdAt" | "updatedAt">): Promise<Post> {
+  async createPost(data: CreatePostData): Promise<Post> {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token não encontrado");
+    }
+
     const response = await fetch(`${API_URL}/posts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(post),
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -52,12 +68,16 @@ export const postService = {
   },
 
   async updatePost(id: string, post: Partial<Post>): Promise<Post> {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Usuário não autenticado");
+    }
+
     const response = await fetch(`${API_URL}/posts/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        Accept: "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify(post),
     });
@@ -69,19 +89,42 @@ export const postService = {
     return response.json();
   },
 
-  async deletePost(id: string, authorId: string): Promise<void> {
+  async deletePost(id: string): Promise<void> {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Usuário não autenticado");
+    }
+
     const response = await fetch(`${API_URL}/posts/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-        Accept: "application/json",
+        "Authorization": `Bearer ${token}`,
       },
-      body: JSON.stringify({ authorId }),
     });
 
     if (!response.ok) {
-      throw new Error("Erro ao deletar post");
+      const errorText = await response.text();
+      let errorMessage = "Erro ao excluir post";
+      
+      try {
+        const parsedError = JSON.parse(errorText);
+        if (parsedError.message) {
+          errorMessage = parsedError.message;
+        }
+      } catch (e) {
+        // Se não for JSON, use o texto do erro
+        errorMessage = errorText;
+      }
+
+      if (response.status === 401) {
+        // Token inválido ou expirado
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        throw new Error("Sua sessão expirou. Por favor, faça login novamente.");
+      }
+
+      throw new Error(errorMessage);
     }
   },
 }; 

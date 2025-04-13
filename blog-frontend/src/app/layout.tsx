@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Blogeek",
-  description: "Um blog simples",
+  description: "Um blog para compartilhar ideias",
 };
 
 export default function RootLayout({
@@ -18,12 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-gray-950 text-gray-100`}>
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen bg-gray-50">
-            {children}
-          </main>
+          <main className="min-h-screen">{children}</main>
         </AuthProvider>
       </body>
     </html>
