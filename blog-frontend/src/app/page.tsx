@@ -1,24 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import MarkdownEditor from "~/components/MarkdownEditor";
-import MarkdownViewer from "~/components/MarkdownViewer";
+import Link from "next/link";
 
 export default function Home() {
-  const [content, setContent] = useState("# Olá\nEste é um **teste** em Markdown.");
-
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-4">Editor de Markdown</h1>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <h2 className="text-xl mb-2">Editor</h2>
-          <MarkdownEditor value={content} onChange={setContent} />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+        <h1 className="text-3xl font-bold text-center mb-8">Blog App</h1>
+        
+        <div className="space-y-4">
+          <Link 
+            href="/login" 
+            className="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center font-medium"
+          >
+            Entrar
+          </Link>
+          
+          <Link 
+            href="/register" 
+            className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center font-medium"
+          >
+            Criar uma conta
+          </Link>
         </div>
-        <div>
-          <h2 className="text-xl mb-2">Visualização</h2>
-          <MarkdownViewer content={content} />
-        </div>
+
+        <p className="mt-8 text-center text-sm text-gray-500">
+          Faça login ou crie uma conta para começar a postar
+        </p>
       </div>
     </div>
   );

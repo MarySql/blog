@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 interface User {
@@ -12,7 +13,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: () => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -30,7 +31,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
+      const storedUsername = localStorage.getItem("user");
+      
+      if (!token || !storedUsername) {
         setLoading(false);
         return;
       }
@@ -46,42 +49,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(userData);
       } else {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     } catch (error) {
       console.error("Erro ao verificar autenticação:", error);
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async () => {
+  const login = async (username: string, password: string) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token não encontrado");
-      }
-
-      const response = await fetch("http://localhost:8080/api/auth/me", {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
-        throw new Error("Falha ao autenticar");
+        throw new Error('Login failed');
       }
 
-      const userData = await response.json();
-      setUser(userData);
+      const data = await response.json();
+      const { token } = data;
+      
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", username);
+      
+      // Atualizar o estado do usuário
+      setUser({ id: '', username, email: '' });
+      
+      // Redirecionar para a página de posts
+      router.push("/posts");
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      throw error;
+      console.error('Erro no login:', error);
+      throw new Error('Login failed');
     }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
     router.push("/login");
   };
@@ -99,4 +111,4 @@ export function useAuth() {
     throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
-}
+} 
