@@ -9,8 +9,8 @@ Este projeto é um blog completo, desenvolvido com uma arquitetura fullstack mod
 - **Editor:** Suporte a escrita em **Markdown**  
 - **Comentários:** Sistema de comentários integrado  
 - **API:** RESTful, com segurança e boas práticas  
-- **Banco de Dados:** (adicione aqui se for usar MySQL, PostgreSQL, MongoDB, etc.)  
-- **Autenticação:** (adicione aqui se houver, ex: JWT, OAuth, etc.)
+- **Banco de Dados:** MongoDB 
+- **Autenticação:** JWT
 
 ## 💡 Objetivo
 
