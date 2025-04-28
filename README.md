@@ -1,4 +1,4 @@
-# 📝 Blog Fullstack — Next.js + Spring Boot
+# 📝 Blogeek Fullstack — Next.js + Spring Boot
 
 Este projeto é um blog completo, desenvolvido com uma arquitetura fullstack moderna, combinando o ecossistema Java com o poder do React:
 
