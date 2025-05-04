@@ -23,7 +23,10 @@ O objetivo do projeto é oferecer uma plataforma de blog simples, eficiente e ex
 
 ## 📸 Preview
 
-...
+![Captura de tela 2025-05-04 082407](https://github.com/user-attachments/assets/80753c4e-9f3f-4c5e-82ed-9d8be2be53ce)
+![Captura de tela 2025-05-04 082430](https://github.com/user-attachments/assets/d482f54f-1c22-4371-ab4f-426cde85d88d)
+
+
 
 ## 📦 Como rodar localmente
 
